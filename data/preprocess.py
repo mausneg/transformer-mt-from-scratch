@@ -58,5 +58,5 @@ if __name__ == '__main__':
     print("\nData setelah preprocessing:")
     for i, target in enumerate(df['en'][-10:].values):
         print(f"{i}: {target}")
-    df.to_csv('data/processed/ind-eng.csv', index=False)
+    df.to_csv('data/processed/id-en.csv', index=False)
     

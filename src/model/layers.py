@@ -1,8 +1,9 @@
 import tensorflow as tf
 import numpy as np
 
-class PositionalEmbedding(tf.keras.layers):
+class PositionalEmbedding(tf.keras.layers.Layer):
     def __init__ (self, vocab_size, d_model):
+        super().__init__()
         self.d_model = d_model
         self.embedding = tf.keras.layers.Embedding(vocab_size, d_model, mask_zero=True)
         self.pos_encoding = self.positional_encoding(length=2048, depth=d_model)
@@ -26,7 +27,7 @@ class PositionalEmbedding(tf.keras.layers):
         x = x + self.pos_encoding[tf.newaxis, :length, :]
         return x
     
-class BaseAttention(tf.keras.layers):
+class BaseAttention(tf.keras.layers.Layer):
     def __init__(self,  **kwargs):
         super().__init__()
         self.mha = tf.keras.layers.MultiHeadAttention(**kwargs)
@@ -54,7 +55,7 @@ class CasualSelfAttention(BaseAttention):
         x = self.norm(x)
         return x
 
-class FeedFoward(tf.keras.layers):
+class FeedFoward(tf.keras.layers.Layer):
     def __init__(self, d_model, dff, dropout_rate=0.1):
         super().__init__()
         self.seq = tf.keras.Sequential([
@@ -71,7 +72,7 @@ class FeedFoward(tf.keras.layers):
         x = self.norm(x)
         return x
     
-class EncoderLayer(tf.keras.layers):
+class EncoderLayer(tf.keras.layers.Layer):
     def __init__(self, num_heads, d_model, dff, dropout_rate=0.1):
         super().__init__()
         self.self_attention = GlobalSelfAttention(num_heads=num_heads, key_dim=d_model, dropout=dropout_rate)
@@ -82,8 +83,9 @@ class EncoderLayer(tf.keras.layers):
         x = self.feed_foward(x)
         return x
 
-class DecoderLayer(tf.keras.layers):
+class DecoderLayer(tf.keras.layers.Layer):
     def __init__(self, num_heads, d_model, dff, dropout_rate=0.1):
+        super().__init__()
         self.casual_attention = CasualSelfAttention(num_heads=num_heads, key_dim=d_model, dropout=dropout_rate)
         self.cross_attention = CrossAttention(num_heads=num_heads, key_dim=d_model, dropout=dropout_rate)
         self.feed_foward = FeedFoward(d_model=d_model, dff=dff, dropout_rate=dropout_rate)

@@ -1,8 +1,8 @@
 import tensorflow as tf
 import numpy as np
-from layers import PositionalEmbedding, EncoderLayer, DecoderLayer
+from .layers import PositionalEmbedding, EncoderLayer, DecoderLayer
 
-class Encoder(tf.keras.layers):
+class Encoder(tf.keras.layers.Layer):
     def __init__(self, num_layers, num_heads, dff, d_model, vocab_size, dropout_rate=0.1):
         super().__init__()
         self.num_layers = num_layers
@@ -17,7 +17,7 @@ class Encoder(tf.keras.layers):
             x = self.encoder_layers[i](x)
         return x
     
-class Decoder(tf.keras.layers):
+class Decoder(tf.keras.layers.Layer):
     def __init__(self, num_layers, num_heads, dff, d_model, vocab_size, dropout_rate=0.1):
         super().__init__()
         self.num_layers = num_layers
@@ -33,11 +33,11 @@ class Decoder(tf.keras.layers):
         return x
     
 class Transformer(tf.keras.Model):
-    def __init__(self, num_layers, num_heads, dff, d_model, vocab_size, dropout_rate=0.1):
+    def __init__(self, num_layers, num_heads, dff, d_model, input_vocab_size, target_vocab_size, dropout_rate=0.1):
         super().__init__()
-        self.encoder = Encoder(d_model=d_model, dff=dff, num_heads=num_heads, num_layers=num_layers, vocab_size=vocab_size, dropout_rate=dropout_rate)
-        self.decoder = Decoder(d_model=d_model, dff=dff, num_heads=num_heads, num_layers=num_layers, vocab_size=vocab_size, dropout_rate=dropout_rate)
-        self.output_layer = tf.keras.layers.Dense(vocab_size)
+        self.encoder = Encoder(d_model=d_model, dff=dff, num_heads=num_heads, num_layers=num_layers, vocab_size=input_vocab_size, dropout_rate=dropout_rate)
+        self.decoder = Decoder(d_model=d_model, dff=dff, num_heads=num_heads, num_layers=num_layers, vocab_size=target_vocab_size, dropout_rate=dropout_rate)
+        self.output_layer = tf.keras.layers.Dense(target_vocab_size)
 
     def call(self, inputs):
         context, target = inputs
