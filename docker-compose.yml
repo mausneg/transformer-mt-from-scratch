@@ -3,7 +3,7 @@ services:
   flask-api:
     build:
       context: .
-      dockerfile: Dockerfile.api
+      dockerfile: api/Dockerfile
     ports:
       - "5000:5000"
     volumes:
@@ -15,7 +15,7 @@ services:
   streamlit-ui:
     build:
       context: .
-      dockerfile: Dockerfile.app
+      dockerfile: app/Dockerfile
     ports:
       - "8501:8501"
     depends_on:
