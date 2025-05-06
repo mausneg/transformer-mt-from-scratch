@@ -1,0 +1,27 @@
+version: "3.9"
+services:
+  flask-api:
+    build:
+      context: .
+      dockerfile: Dockerfile.api
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./src:/app/src
+      - ./saved_models:/app/saved_models
+    networks:
+      - mt-network
+
+  streamlit-ui:
+    build:
+      context: .
+      dockerfile: Dockerfile.app
+    ports:
+      - "8501:8501"
+    depends_on:
+      - flask-api
+    networks:
+      - mt-network
+
+networks:
+  mt-network:
