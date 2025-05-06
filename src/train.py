@@ -21,9 +21,6 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__)) + '/../')
 from src.model.transformer import Transformer
 from src.model.utils import CustomSchedule, masked_accuracy, masked_loss
 
-
-
-
 batch_size = 64
 epochs = 50
 num_layers = 4

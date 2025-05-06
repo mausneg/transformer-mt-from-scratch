@@ -9,24 +9,9 @@ from src.model.utils import CustomSchedule, masked_accuracy, masked_loss
 from data.preprocess import preprocessing
 import pickle
 
-with open('saved_models/x_tokenizer.pkl', 'rb') as f:
-    x_tokenizer = pickle.load(f)
 
-with open('saved_models/y_tokenizer.pkl', 'rb') as f:
-    y_tokenizer = pickle.load(f)
 
-with open('saved_models/max_lengths.pkl', 'rb') as f:
-    lengths = pickle.load(f)
-    max_len_x = lengths['max_len_x']
-    max_len_y = lengths['max_len_y']
-
-model = tf.keras.models.load_model('saved_models/transformer_1', custom_objects={
-    'CustomSchedule': CustomSchedule,
-    'masked_loss': masked_loss,
-    'masked_accuracy': masked_accuracy
-})
-
-def translate(input_text):
+def translate(input_text, x_tokenizer, y_tokenizer, model, max_len_x, max_len_y):
     predict_seq = x_tokenizer.texts_to_sequences([input_text])
     predict_seq = tf.keras.preprocessing.sequence.pad_sequences(predict_seq, padding='post', maxlen=max_len_x)
     predict_seq = tf.convert_to_tensor(predict_seq, dtype=tf.int32)
@@ -50,8 +35,26 @@ def translate(input_text):
 
     return ' '.join(translated_sentence)
 
-input_text = "Dia datang ke Jepang untuk belajar bahasa Jepang."
-input_text = preprocessing(pd.Series([input_text])).values[0]
-translated_text = translate(input_text)
-print("Input:", input_text)
-print("Predicted translation:", translated_text)
+if __name__ == '__main__':
+    with open('saved_models/x_tokenizer.pkl', 'rb') as f:
+        x_tokenizer = pickle.load(f)
+
+    with open('saved_models/y_tokenizer.pkl', 'rb') as f:
+        y_tokenizer = pickle.load(f)
+
+    with open('saved_models/max_lengths.pkl', 'rb') as f:
+        lengths = pickle.load(f)
+        max_len_x = lengths['max_len_x']
+        max_len_y = lengths['max_len_y']
+
+    model = tf.keras.models.load_model('saved_models/transformer_1', custom_objects={
+        'CustomSchedule': CustomSchedule,
+        'masked_loss': masked_loss,
+        'masked_accuracy': masked_accuracy
+    })
+
+    input_text = "Dia datang ke Jepang untuk belajar bahasa Jepang."
+    input_text = preprocessing(pd.Series([input_text])).values[0]
+    translated_text = translate(input_text, x_tokenizer, y_tokenizer, model)
+    print("Input:", input_text)
+    print("Predicted translation:", translated_text)
