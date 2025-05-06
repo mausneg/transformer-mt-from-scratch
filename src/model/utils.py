@@ -12,6 +12,12 @@ class CustomSchedule(tf.keras.optimizers.schedules.LearningRateSchedule):
         arg_2 = step * (self.warmup_steps ** -1.5)
         lr_rate = tf.math.rsqrt(self.d_model) * tf.math.minimum(arg_1, arg_2)
         return lr_rate
+    
+    def get_config(self):
+        return {
+            "d_model": self.d_model.numpy(),
+            "warmup_steps": self.warmup_steps
+        }
 
 def masked_loss(label, pred):
     mask = label != 0
@@ -32,3 +38,4 @@ def masked_accuracy(label, pred):
     match = tf.cast(match, dtype=tf.float32)
     mask = tf.cast(mask, dtype=tf.float32)
     return tf.reduce_sum(match)/tf.reduce_sum(mask)
+

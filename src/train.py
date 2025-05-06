@@ -1,4 +1,17 @@
 import tensorflow as tf
+
+gpus = tf.config.experimental.list_physical_devices('GPU')
+if gpus:
+    try:
+        tf.config.experimental.set_virtual_device_configuration(
+            gpus[0],
+            [tf.config.experimental.VirtualDeviceConfiguration(memory_limit=4096)]
+        )
+        print("✅ Set memory limit to full 4096 MB")
+    except RuntimeError as e:
+        print(e)
+        
+import pickle
 import pandas as pd
 import numpy as np
 import os
@@ -8,13 +21,16 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__)) + '/../')
 from src.model.transformer import Transformer
 from src.model.utils import CustomSchedule, masked_accuracy, masked_loss
 
-batch_size = 32
-epochs = 100
+
+
+
+batch_size = 64
+epochs = 50
 num_layers = 4
 num_heads = 8
-d_model = 256
+d_model = 128
 dff = 512
-dropout_rate = 0.2
+dropout_rate = 0.1
 
 df = pd.read_csv('data/processed/id-en.csv')
 
@@ -83,5 +99,13 @@ history = model.fit(
     batch_size=batch_size,
     epochs=epochs,
 )
+model.save('saved_models/transformer_1')
 
-model.save_weights('saved_models/transformer_1')
+with open('saved_models/x_tokenizer.pkl', 'wb') as f:
+    pickle.dump(x_tokenizer, f)
+
+with open('saved_models/y_tokenizer.pkl', 'wb') as f:
+    pickle.dump(y_tokenizer, f)
+
+with open('saved_models/max_lengths.pkl', 'wb') as f:
+    pickle.dump({'max_len_x': max_len_x, 'max_len_y': max_len_y}, f)
